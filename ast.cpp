@@ -56,7 +56,7 @@ class ImaginaryAST : public ExprAST {
     ImaginaryAST(double imagPart) : imagPart(imagPart) {}
 };
 
-class AddAST : ExprAST {
+class AddAST : public ExprAST {
   std::unique_ptr<ExprAST> Left;
   std::unique_ptr<ExprAST> Right;
 
@@ -65,7 +65,7 @@ class AddAST : ExprAST {
     }
 };
 
-class SubAST : ExprAST {
+class SubAST : public ExprAST {
   std::unique_ptr<ExprAST> Left;
   std::unique_ptr<ExprAST> Right;
 
@@ -74,7 +74,7 @@ class SubAST : ExprAST {
     }
 };
 
-class MultiAddAST : ExprAST {
+class MultiAddAST : public ExprAST {
   std::vector<std::unique_ptr<ExprAST>> Exprs;
 
   public:
@@ -92,7 +92,12 @@ std::unique_ptr<ExprAST> exampleTree() {
 
   std::unique_ptr<ExprAST> oneMinus = 
     std::make_unique<SubAST>(std::make_unique<NumAST>(1), std::move(fourMinusThree));
-}
+
+  std::unique_ptr<ExprAST> result =
+    std::make_unique<AddAST>(std::move(threeMinusTwo), std::move(oneMinus));
+  
+  return result;
+};
 
 
 /*
