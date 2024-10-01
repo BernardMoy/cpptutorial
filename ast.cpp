@@ -17,7 +17,7 @@ public:
   double realPart() { return Real; };
   double imagPart() { return Imaginary; };
   void printComplex() {
-    std::cout << std::to_string(Real) << "+" << std::to_string(Imaginary) << std::endl;
+    std::cout << std::to_string(Real) << "+" << std::to_string(Imaginary) << "i" << std::endl;
   };
 };
 
@@ -47,13 +47,22 @@ public:
   }
 };
 
+// global symbol table for constants
+std::map<std::string, Complex> constants;
+
+void initialiseConstantsMap(){
+  constants["a"] = Complex(1,3);
+  constants["b"] = Complex(-2,4);
+  constants["c"] = Complex(5,-6);
+};
+
 class ConstAST : public ExprAST {
-  double E;
+  std::string E;
 
   public:
-    ConstAST(double e) : E(e) {}
+    ConstAST(std::string e) : E(e) {}
     virtual Complex evaluate(){
-      return Complex(E, 0);
+      return constants[E];
     }
 };
 
@@ -108,7 +117,7 @@ class MultiAddAST : public ExprAST {
       Complex result = Exprs[0] -> evaluate();
       
       // iterate the vector
-      for (int i = 1 ; i <= Exprs.size(); i++){
+      for (int i = 1 ; i < Exprs.size(); i++){
         Complex temp = Exprs[i] -> evaluate();
         result = addComplex(result, temp);
       }
@@ -135,7 +144,7 @@ std::unique_ptr<ExprAST> exampleTree() {
 };
 
 
-/*
+
 std::unique_ptr<ExprAST> constantsSum() {
   std::vector<std::unique_ptr<ExprAST>> consts;
   consts.push_back(std::make_unique<ConstAST>("a"));
@@ -143,7 +152,7 @@ std::unique_ptr<ExprAST> constantsSum() {
   consts.push_back(std::make_unique<ConstAST>("c"));
   return std::make_unique<MultiAddAST>(std::move(consts));
 }
-*/
+
 
 int main() {
   std::cout << "Hello World" << std::endl;
@@ -151,7 +160,11 @@ int main() {
   // load and evaluate the hardcoded example tree
   std::unique_ptr<ExprAST> example = exampleTree();
   Complex result = example -> evaluate();
-  result.printComplex();
+  result.printComplex();   // Expected -1 + 4i
 
-  // TODO: TASK 12
+  // print results of constantsSum()
+  initialiseConstantsMap();  // initialise the constant map first
+  std::unique_ptr<ExprAST> example2 = constantsSum();  // get Complex object of constant sum with given method
+  Complex result2 = example2 -> evaluate();
+  result2.printComplex();   // Expected 4 + 1i
 }
