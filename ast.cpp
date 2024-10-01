@@ -74,9 +74,11 @@ class AddAST : public ExprAST {
   public:
     AddAST(std::unique_ptr<ExprAST> l, std::unique_ptr<ExprAST> r) : Left(std::move(l)), Right(std::move(r)) {
     }
-    // default method for evaluate
-    virtual Complex evaluate(){
-      return Complex();
+    virtual Complex evaluate() override {
+      Complex leftResult = Left -> evaluate();
+      Complex rightResult = Right -> evaluate();
+
+      return addComplex(leftResult, rightResult);
     }
 };
 
@@ -87,9 +89,11 @@ class SubAST : public ExprAST {
   public:
     SubAST(std::unique_ptr<ExprAST> l, std::unique_ptr<ExprAST> r) : Left(std::move(l)), Right(std::move(r)) {
     }
-    // default method for evaluate
-    virtual Complex evaluate(){
-      return Complex();
+    virtual Complex evaluate() override {
+      Complex leftResult = Left -> evaluate();
+      Complex rightResult = Right -> evaluate();
+
+      return addComplex(leftResult, negComplex(rightResult));
     }
 };
 
@@ -99,9 +103,17 @@ class MultiAddAST : public ExprAST {
   public:
     MultiAddAST(std::vector<std::unique_ptr<ExprAST>> exprs) : Exprs(std::move(exprs)) {
     }
-    // default method for evaluate
-    virtual Complex evaluate(){
-      return Complex();
+
+    virtual Complex evaluate() override {
+      Complex result = Exprs[0] -> evaluate();
+      
+      // iterate the vector
+      for (int i = 1 ; i <= Exprs.size(); i++){
+        Complex temp = Exprs[i] -> evaluate();
+        result = addComplex(result, temp);
+      }
+      
+      return result;
     }
 };
 
@@ -113,11 +125,11 @@ std::unique_ptr<ExprAST> exampleTree() {
   std::unique_ptr<ExprAST> threeMinusTwo = 
     std::make_unique<SubAST>(std::make_unique<NumAST>(3), std::make_unique<NumAST> (2));
 
-  std::unique_ptr<ExprAST> oneMinus = 
-    std::make_unique<SubAST>(std::make_unique<NumAST>(1), std::move(fourMinusThree));
+  std::unique_ptr<ExprAST> onePlus = 
+    std::make_unique<AddAST>(std::make_unique<NumAST>(1), std::move(fourMinusThree));
 
   std::unique_ptr<ExprAST> result =
-    std::make_unique<AddAST>(std::move(threeMinusTwo), std::move(oneMinus));
+    std::make_unique<AddAST>(std::move(threeMinusTwo), std::move(onePlus));
   
   return result;
 };
@@ -135,6 +147,11 @@ std::unique_ptr<ExprAST> constantsSum() {
 
 int main() {
   std::cout << "Hello World" << std::endl;
-  // TODO: TASK 9
+
+  // load and evaluate the hardcoded example tree
+  std::unique_ptr<ExprAST> example = exampleTree();
+  Complex result = example -> evaluate();
+  result.printComplex();
+
   // TODO: TASK 12
 }
