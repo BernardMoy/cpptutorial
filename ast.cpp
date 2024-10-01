@@ -17,7 +17,7 @@ public:
   double realPart() { return Real; };
   double imagPart() { return Imaginary; };
   void printComplex() {
-    // TODO: TASK 5
+    std::cout << std::to_string(Real) << "+" << std::to_string(Imaginary) << std::endl;
   };
 };
 
@@ -32,7 +32,9 @@ Complex negComplex(Complex l) {
 class ExprAST {
 public:
     ExprAST() {};
-    // TODO: TASK 6
+    virtual Complex evaluate() {
+      return Complex();
+    }
 };
 
 class NumAST : public ExprAST {
@@ -40,6 +42,9 @@ class NumAST : public ExprAST {
 
 public:
   NumAST(double val) : Val(val) {}
+  virtual Complex evaluate(){
+    return Complex(Val, 0);
+  }
 };
 
 class ConstAST : public ExprAST {
@@ -47,6 +52,9 @@ class ConstAST : public ExprAST {
 
   public:
     ConstAST(double e) : E(e) {}
+    virtual Complex evaluate(){
+      return Complex(E, 0);
+    }
 };
 
 class ImaginaryAST : public ExprAST {
@@ -54,6 +62,9 @@ class ImaginaryAST : public ExprAST {
 
   public:
     ImaginaryAST(double imagPart) : imagPart(imagPart) {}
+    virtual Complex evaluate(){
+      return Complex(0, imagPart);
+    }
 };
 
 class AddAST : public ExprAST {
@@ -62,6 +73,10 @@ class AddAST : public ExprAST {
 
   public:
     AddAST(std::unique_ptr<ExprAST> l, std::unique_ptr<ExprAST> r) : Left(std::move(l)), Right(std::move(r)) {
+    }
+    // default method for evaluate
+    virtual Complex evaluate(){
+      return Complex();
     }
 };
 
@@ -72,6 +87,10 @@ class SubAST : public ExprAST {
   public:
     SubAST(std::unique_ptr<ExprAST> l, std::unique_ptr<ExprAST> r) : Left(std::move(l)), Right(std::move(r)) {
     }
+    // default method for evaluate
+    virtual Complex evaluate(){
+      return Complex();
+    }
 };
 
 class MultiAddAST : public ExprAST {
@@ -79,6 +98,10 @@ class MultiAddAST : public ExprAST {
 
   public:
     MultiAddAST(std::vector<std::unique_ptr<ExprAST>> exprs) : Exprs(std::move(exprs)) {
+    }
+    // default method for evaluate
+    virtual Complex evaluate(){
+      return Complex();
     }
 };
 
